@@ -27,5 +27,4 @@ public class SftpConfig {
         factory.setAllowUnknownKeys(true);
         return factory;
     }
-
 }
