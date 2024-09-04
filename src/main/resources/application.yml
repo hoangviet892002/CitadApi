@@ -17,6 +17,6 @@ spring:
       remote-directory: /C:/Users/Administrator/Documents
       local-directory: src/main/resources/data.txt
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/citad
-    username: postgres
-    password: 12345
+    url: ${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
