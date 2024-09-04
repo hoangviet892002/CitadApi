@@ -1,0 +1,22 @@
+spring:
+  application:
+    openApi:
+      title: Citad API
+      description: Citad API
+      version: 1.0
+      license:
+        name: Apache License Version 2.0
+        url: https://www.apache.org/licenses/LICENSE-2.0
+      name: citad-api
+      url: https://citad.com
+    sftp:
+      host: ${HOST}
+      port: 22
+      user: ${USERNAME}
+      password: ${PASSWORD}
+      remote-directory: /C:/Users/Administrator/Documents
+      local-directory: src/main/resources/data.txt
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/citad
+    username: postgres
+    password: 12345
