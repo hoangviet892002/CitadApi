@@ -32,10 +32,12 @@ public class CitadServiceImpl implements CitadService {
 
     @Override
     public Mono<BaseReponse<BaseList<CitadReponse>>> queryCitads(String page, String size) {
-        return validateRequest(page, size).then(Mono.deferContextual(ctx ->
-                {
+        return validateRequest(page, size).flatMap(
+                baseReponse -> {
+                    if (baseReponse.getMessage() != null) {
+                        return Mono.just(baseReponse);
+                    }
 
-                    BaseReponse<BaseList<CitadReponse>> baseReponse = new BaseReponse<>();
                     try {
                         logger.info("Getting list citad");
                         BaseList<CitadReponse> baseList = new BaseList<>();
@@ -53,19 +55,32 @@ public class CitadServiceImpl implements CitadService {
                         logger.info("Return response");
                         return Mono.just(baseReponse);
                     } catch (Exception e) {
-                        logger.error("Error when getting list citad", e);
                         baseReponse.setMessage(ResponseEnum.INTERNAL_ERROR.getMessage());
                         baseReponse.setResponseCode(ResponseEnum.INTERNAL_ERROR.getResponseCode());
                         return Mono.just(baseReponse);
                     }
-                }));
+                }
+        );
     }
 
-    public Mono<Void> validateRequest(String page, String size) {
+    public Mono<BaseReponse<BaseList<CitadReponse>>> validateRequest(String page, String size) {
         logger.info("Validating request");
+        BaseReponse<BaseList<CitadReponse>> validateResponse = new BaseReponse<>();
         if (page == null || size == null) {
-            return Mono.error(new Exception("Page or size is null"));
+            validateResponse.setMessage(ResponseEnum.BAD_REQUEST.getMessage());
+            validateResponse.setResponseCode(ResponseEnum.BAD_REQUEST.getResponseCode());
+            logger.error("Error when validate request");
+            return Mono.just(validateResponse);
         }
-        return Mono.empty();
+        try {
+            Integer.parseInt(page);
+            Integer.parseInt(size);
+            return Mono.empty();
+        } catch (Exception e) {
+            validateResponse.setMessage(ResponseEnum.BAD_REQUEST.getMessage());
+            validateResponse.setResponseCode(ResponseEnum.BAD_REQUEST.getResponseCode());
+            logger.error("Error when validate request");
+            return Mono.just(validateResponse);
+        }
     }
 }
