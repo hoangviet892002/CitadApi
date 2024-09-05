@@ -1,6 +1,9 @@
 package HDBanktraining.CitadApi.configs;
 
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
@@ -11,6 +14,12 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
+@SecurityScheme(
+        name = "Api-Key",
+        description = "API Key Authentication",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.HEADER
+)
 public class OpenApiConfig {
 
     @Value("${spring.application.openApi.description}")
