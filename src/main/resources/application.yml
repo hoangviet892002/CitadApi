@@ -20,3 +20,12 @@ spring:
     url: ${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
+
+  logging:
+    level:
+      root: INFO
+      org.springframework: INFO
+      com.example: DEBUG
+    path: src/main/resources/logs
+    layout:
+      pattern: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %m%n"
