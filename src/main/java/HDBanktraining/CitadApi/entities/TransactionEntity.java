@@ -1,64 +1,33 @@
 package HDBanktraining.CitadApi.entities;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Entity
+@Table(name = "transaction")
 public class TransactionEntity extends BaseEntity{
 
-    private String senderId;
-    private String receiverId;
+    @Column(name = "amount")
     private double amount;
-    private String message;
-    private String status;
+    @Column(name = "type")
     private String type;
-    private String transactionId;
-    private String senderName;
-    private String receiverName;
-    private String senderAccountNumber;
-    private String receiverAccountNumber;
-    private String senderBankCode;
-    private String receiverBankCode;
-    private String senderBranch;
-    private String receiverBranch;
-    private String senderCitadCode;
-    private String receiverCitadCode;
-    private String senderCitadBranch;
-    private String receiverCitadBranch;
-    private String senderCitadName;
-    private String receiverCitadName;
-    private String senderCitadAccountNumber;
-    private String receiverCitadAccountNumber;
-    private String senderCitadAccountName;
-    private String receiverCitadAccountName;
-    private String senderCitadAccountType;
-    private String receiverCitadAccountType;
-    private String senderCitadAccountBalance;
-    private String receiverCitadAccountBalance;
-    private String senderCitadAccountCurrency;
-    private String receiverCitadAccountCurrency;
-    private String senderCitadAccountStatus;
-    private String receiverCitadAccountStatus;
-    private String senderCitadAccountCreatedAt;
-    private String receiverCitadAccountCreatedAt;
-    private String senderCitadAccountUpdatedAt;
-    private String receiverCitadAccountUpdatedAt;
-    private String senderCitadAccountIsActive;
-    private String receiverCitadAccountIsActive;
-    private String senderCitadAccountDob;
-    private String receiverCitadAccountDob;
-    private String senderCitadAccountPhone;
-    private String receiverCitadAccountPhone;
-    private String senderCitadAccountEmail;
-    private String receiverCitadAccountEmail;
-    private String senderCitadAccountAddress;
-    private String receiverCitadAccountAddress;
-    private String senderCitadAccountWallet;
-    private String receiverCitadAccountWallet;
-    private String senderCitadAccountCode;
-    private String receiverCitadAccountCode;
-    private String senderCitadAccountBranch;
-    private String receiverCitadAccountBranch;
-    private String senderCitadAccountCitadCode;
-    private String receiverCitadAccountCitadCode;
-    private String senderCitadAccountCitadBranch;
-    private String receiverCitadAccountCitadBranch;
-    private String senderCitadAccountCitad;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "status")
+    private String status;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
+    private ClientEntity receiver;
+    @ManyToOne
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    private ClientEntity sender;
 
 }
