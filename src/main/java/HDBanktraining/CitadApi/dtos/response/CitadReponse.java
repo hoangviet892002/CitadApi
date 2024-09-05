@@ -1,5 +1,6 @@
 package HDBanktraining.CitadApi.dtos.response;
 
+import HDBanktraining.CitadApi.entities.CitadEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +12,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseReponse <T>{
-    @JsonProperty("response_code")
-    private String responseCode;
-    @JsonProperty("message")
-    private String message;
-    @JsonProperty("data")
-    private T data;
+public class CitadReponse {
+    @JsonProperty("code")
+    private String code;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("branch")
+    private String branch;
+
+
 }
