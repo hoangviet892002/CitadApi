@@ -30,4 +30,6 @@ public class CitadEntity extends BaseEntity {
     @OneToMany(mappedBy = "citad")
     private List<ClientEntity> clients;
 
+    public CitadEntity(String code, String name, String branch) {
+    }
 }
