@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,16 +17,24 @@ import lombok.Setter;
 public class BaseEntity {
     @Id
     @Column(name = "id")
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
-    @Column(name = "created_at")
-    private String createdAt;
-
     @Column(name = "updated_at")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
 
 }
