@@ -1,6 +1,5 @@
 package HDBanktraining.CitadApi.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,4 +36,6 @@ public class ClientEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "citad_id", referencedColumnName = "id")
     private CitadEntity citad;
+    @OneToMany(mappedBy = "client")
+    private List<otpEntity> otps;
 }

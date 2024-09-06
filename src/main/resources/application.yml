@@ -26,7 +26,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_schema: transaction_bank
+        default_schema: ${POSTGRES_SCHEMAS}
     show-sql: true
 
   logging:
@@ -37,3 +37,8 @@ spring:
     path: src/main/resources/logs
     layout:
       pattern: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %m%n"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
