@@ -1,6 +1,6 @@
-package HDBanktraining.CitadApi.services.CitadServices.impl;
+package HDBanktraining.CitadApi.services.SftpServices.impl;
 
-import HDBanktraining.CitadApi.services.CitadServices.SftpService;
+import HDBanktraining.CitadApi.services.SftpServices.SftpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.stereotype.Service;

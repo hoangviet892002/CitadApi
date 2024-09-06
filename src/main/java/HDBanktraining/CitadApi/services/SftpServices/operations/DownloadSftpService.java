@@ -1,4 +1,4 @@
-package HDBanktraining.CitadApi.services.CitadServices.operations;
+package HDBanktraining.CitadApi.services.SftpServices.operations;
 
 public interface DownloadSftpService {
     void downloadFile(String remoteFilePath, String localFilePath);

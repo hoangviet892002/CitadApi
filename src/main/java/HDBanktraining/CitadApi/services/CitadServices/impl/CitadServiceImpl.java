@@ -8,7 +8,7 @@ import HDBanktraining.CitadApi.entities.CitadEntity;
 import HDBanktraining.CitadApi.mappers.CitadMappers;
 import HDBanktraining.CitadApi.repository.CitadRepo.CitadRepo;
 import HDBanktraining.CitadApi.services.CitadServices.CitadService;
-import HDBanktraining.CitadApi.services.CitadServices.SftpService;
+import HDBanktraining.CitadApi.services.SftpServices.SftpService;
 import HDBanktraining.CitadApi.shared.enums.ResponseEnum;
 import HDBanktraining.CitadApi.utils.ExcelReader;
 import org.apache.log4j.Logger;
