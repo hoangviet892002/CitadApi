@@ -16,5 +16,4 @@ public class CitadMappers {
     public List<CitadReponse> entityToCitadReponse(List<CitadEntity> citadEntities) {
         return citadEntities.stream().map(this::entityToCitadReponse).collect(Collectors.toList());
     }
-
 }
