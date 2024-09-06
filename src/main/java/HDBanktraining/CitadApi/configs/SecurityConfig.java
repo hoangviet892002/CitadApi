@@ -1,5 +1,6 @@
 package HDBanktraining.CitadApi.configs;
 
+import HDBanktraining.CitadApi.utils.ExcelReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -58,4 +59,10 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public ExcelReader excelReader() {
+        return new ExcelReader();
+    }
+
 }
