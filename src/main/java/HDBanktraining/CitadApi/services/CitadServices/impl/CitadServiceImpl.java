@@ -111,7 +111,9 @@ public class CitadServiceImpl implements CitadService {
 
         logger.info("Citad list is updating");
 
+
         Path tempFilePath = RESOURCES_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
+
 
         if (!Files.exists(tempFilePath)) {
             Files.createFile(tempFilePath);
@@ -136,5 +138,10 @@ public class CitadServiceImpl implements CitadService {
                 citadRepo.save(citadEntity);
             }
         }
+    }
+
+    @Override
+    public Mono<CitadEntity> queryCitad(String code) {
+        return Mono.justOrEmpty(citadRepo.findByCode(code));
     }
 }

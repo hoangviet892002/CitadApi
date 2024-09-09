@@ -13,7 +13,9 @@ public enum ResponseEnum {
     BIZ_ERROR("0001", "Business error", "Business error"),
     RESOURCE_NOT_FOUND("0404", "Resource not found", "Resource not found"),
     DATA_SUCCESS("1930","success","Getting data success."),
-    DATA_NOT_FOUND("1931", "Decline", "No information found");
+    DATA_NOT_FOUND("1931", "Decline", "No information found"),
+    INSUFFICIENT_BALANCE("0402", "Insufficient balance", "The account does not have enough balance");
+
 
     private final String responseCode;
     private final String message;
