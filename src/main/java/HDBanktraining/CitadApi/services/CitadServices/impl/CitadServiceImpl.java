@@ -31,7 +31,7 @@ public class CitadServiceImpl implements CitadService {
 
     private static final String TEMP_FILE_SUFFIX = ".xlsx";
 
-    private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    private static final Path RESOURCES_DIR = Paths.get("src/main/resources");
 
     private static final String REMOTE_FILE_PATH = "C:\\Users\\Administrator\\Documents\\bank-code-list.xlsx";
 
@@ -111,7 +111,7 @@ public class CitadServiceImpl implements CitadService {
 
         logger.info("Citad list is updating");
 
-        Path tempFilePath = TEMP_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
+        Path tempFilePath = RESOURCES_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
 
         if (!Files.exists(tempFilePath)) {
             Files.createFile(tempFilePath);
