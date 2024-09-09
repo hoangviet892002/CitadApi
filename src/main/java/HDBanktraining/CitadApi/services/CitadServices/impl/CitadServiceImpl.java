@@ -1,7 +1,5 @@
 package HDBanktraining.CitadApi.services.CitadServices.impl;
 
-import HDBanktraining.CitadApi.controllers.testApi.Get.GetTestApi;
-import HDBanktraining.CitadApi.dtos.request.CitadRequest;
 import HDBanktraining.CitadApi.dtos.response.BaseList;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.CitadReponse;
@@ -16,18 +14,24 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 
 @Service
 public class CitadServiceImpl implements CitadService {
 
-    private static final String LOCAL_FILE_PATH = "C:\\Users\\ADMIN\\Downloads\\HD-Bank\\bank-code-list.xlsx";
+    private static final String TEMP_FILE_PREFIX = "bank-code-list";
+
+    private static final String TEMP_FILE_SUFFIX = ".xlsx";
+
+    private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
 
     private static final String REMOTE_FILE_PATH = "C:\\Users\\Administrator\\Documents\\bank-code-list.xlsx";
 
@@ -103,12 +107,23 @@ public class CitadServiceImpl implements CitadService {
     }
 
     @Override
-    @Scheduled(fixedRate = 5000)
     public void checkAndSaveCitadData() throws IOException {
-        logger.info("Citad list is updating");
-        sftpService.downloadFile(REMOTE_FILE_PATH, LOCAL_FILE_PATH);
 
-        List<CitadReponse> citadDTOs = excelReader.readCitadFromExcel(LOCAL_FILE_PATH);
+        logger.info("Citad list is updating");
+
+        Path tempFilePath = TEMP_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
+
+        if (!Files.exists(tempFilePath)) {
+            Files.createFile(tempFilePath);
+        }
+
+        String localFilePath = tempFilePath.toAbsolutePath().toString();
+
+        logger.info("Local File: " + localFilePath);
+
+        sftpService.downloadFile(REMOTE_FILE_PATH, localFilePath);
+
+        List<CitadReponse> citadDTOs = excelReader.readCitadFromExcel(localFilePath);
 
         for (CitadReponse citadDTO : citadDTOs) {
             if (!citadRepo.existsByCode(citadDTO.getCode())) {
