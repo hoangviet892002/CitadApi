@@ -15,7 +15,8 @@ public class CitadCodeSyncJob {
         this.citadService = citadService;
     }
 
-    @Scheduled(cron = "*/5 * * * * *")
+    // 1:00 AM every day
+    @Scheduled(cron = "0 0 1 * * ?")
     public void syncCitadCodeFromExcel() throws IOException {
         citadService.checkAndSaveCitadData();
     }

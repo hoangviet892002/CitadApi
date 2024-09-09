@@ -1,0 +1,7 @@
+package HDBanktraining.CitadApi.services.ClientServices;
+
+import HDBanktraining.CitadApi.services.ClientServices.operations.InsertClientService;
+import HDBanktraining.CitadApi.services.ClientServices.operations.QueryClientService;
+
+public interface ClientService extends QueryClientService, InsertClientService {
+}

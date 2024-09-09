@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class BaseEntity {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "updated_at")
