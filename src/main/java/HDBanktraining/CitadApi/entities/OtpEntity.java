@@ -13,12 +13,10 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "otp")
-public class otpEntity extends BaseEntity{
+public class OtpEntity extends BaseEntity{
     @Column(name = "otp")
     private String otp;
-    @Column(name = "expired_at")
-    private String expiredAt;
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    private ClientEntity client;
+    @OneToOne
+    @JoinColumn(name = "transaction", referencedColumnName = "id")
+    private TransactionEntity transaction;
 }

@@ -4,4 +4,6 @@ import HDBanktraining.CitadApi.entities.ClientEntity;
 
 public interface ClientReadRepository {
     ClientEntity findByEmail(String email);
+
+    ClientEntity findById(String clientId);
 }

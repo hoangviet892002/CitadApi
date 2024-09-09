@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,5 +31,6 @@ public class TransactionEntity extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private ClientEntity sender;
+
 
 }

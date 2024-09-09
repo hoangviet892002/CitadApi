@@ -36,17 +36,16 @@ public class ClientEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "citad_id", referencedColumnName = "id")
     private CitadEntity citad;
-    @OneToMany(mappedBy = "client")
-    private List<otpEntity> otps;
+
 
 
     public static ClientEntity DefaultEntites(CitadEntity citad) {
         ClientEntity clientEntity = new ClientEntity();
         clientEntity.setCitad(citad);
-        clientEntity.setAddress("address");
-        clientEntity.setEmail("email");
-        clientEntity.setName("name");
-        clientEntity.setPhone("phone");
+        clientEntity.setAddress("address2");
+        clientEntity.setEmail("email2");
+        clientEntity.setName("name2");
+        clientEntity.setPhone("phone2");
         clientEntity.setDob("dob");
         clientEntity.setWallet(0);
         return clientEntity;

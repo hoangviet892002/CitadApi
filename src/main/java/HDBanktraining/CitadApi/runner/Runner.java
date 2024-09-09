@@ -23,7 +23,7 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        CitadEntity citadEntity = citadService.queryCitad("79202002").block();
+        CitadEntity citadEntity = citadService.queryCitad("79321001").block();
         if (citadEntity != null) {
             logger.info("Citad already exist");
             clientService.insertClient(citadEntity).block();

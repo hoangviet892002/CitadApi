@@ -31,4 +31,28 @@ public class ClientServiceImpl implements ClientService {
         logger.info("Insert client success");
         return Mono.empty();
     }
+
+    @Override
+    public Mono<Boolean> checkBalance(String client_id, Double amount) {
+        ClientEntity clientEntity = clientRepo.findById(client_id);
+        if (clientEntity == null) {
+            logger.info("Client not found");
+            return Mono.just(false);
+        }
+        if (clientEntity.getWallet() < amount) {
+            logger.info("Balance not enough");
+            return Mono.just(false);
+        }
+        return Mono.just(true);
+    }
+
+    @Override
+    public Mono<ClientEntity> getClientById(String clientId) {
+        ClientEntity clientEntity = clientRepo.findById(clientId);
+        if (clientEntity == null) {
+            logger.info("Client not found");
+            return Mono.empty();
+        }
+        return Mono.just(clientEntity);
+    }
 }
