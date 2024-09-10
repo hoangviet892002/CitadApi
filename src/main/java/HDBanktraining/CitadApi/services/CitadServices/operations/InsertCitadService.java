@@ -1,7 +1,9 @@
 package HDBanktraining.CitadApi.services.CitadServices.operations;
 
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
 
 public interface InsertCitadService {
-    void checkAndSaveCitadData() throws IOException;
+    Mono<Void> checkAndSaveCitadData() throws IOException;
 }

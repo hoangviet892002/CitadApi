@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -22,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -107,37 +110,76 @@ public class CitadServiceImpl implements CitadService {
     }
 
     @Override
-    public void checkAndSaveCitadData() throws IOException {
+    public Mono<Void> checkAndSaveCitadData() {
+        return Mono.fromCallable(() -> {
+                    logger.info("Citad list is updating");
 
-        logger.info("Citad list is updating");
+                    Path tempFilePath = RESOURCES_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
 
+                    if (Files.exists(tempFilePath)) {
+                        Files.delete(tempFilePath);
+                        logger.info("Old local file deleted.");
+                    }
 
-        Path tempFilePath = RESOURCES_DIR.resolve(TEMP_FILE_PREFIX + TEMP_FILE_SUFFIX);
+                    Files.createFile(tempFilePath);
+                    String localFilePath = tempFilePath.toAbsolutePath().toString();
 
+                    sftpService.downloadFile(REMOTE_FILE_PATH, localFilePath);
+                    logger.info("New file downloaded from the server to local path: " + localFilePath);
 
-        if (!Files.exists(tempFilePath)) {
-            Files.createFile(tempFilePath);
-        }
+                    return localFilePath;
+                }).flatMap(localFilePath -> {
+                    List<CitadReponse> citadDTOs = null;
+                    try {
+                        citadDTOs = excelReader.readCitadFromExcel(localFilePath);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Set<String> newFileCodes = citadDTOs.stream().map(CitadReponse::getCode).collect(Collectors.toSet());
 
-        String localFilePath = tempFilePath.toAbsolutePath().toString();
+                    return Flux.fromIterable(citadDTOs)
+                            .flatMap(citadDTO -> {
+                                return Mono.fromCallable(() -> citadRepo.findByCode(citadDTO.getCode()))
+                                        .flatMap(existingEntityOptional -> {
+                                            if (existingEntityOptional.isEmpty()) {
+                                                CitadEntity newEntity = new CitadEntity();
+                                                newEntity.setCode(citadDTO.getCode());
+                                                newEntity.setName(citadDTO.getName());
+                                                newEntity.setBranch(citadDTO.getBranch());
+                                                newEntity.setActive(true);
+                                                citadRepo.save(newEntity);
+                                                logger.info("Citad code " + citadDTO.getCode() + " is created");
+                                            } else {
+                                                CitadEntity existingEntity = existingEntityOptional.get();
+                                                boolean isUpdated = false;
+                                                if (!existingEntity.getName().equals(citadDTO.getName())) {
+                                                    existingEntity.setName(citadDTO.getName());
+                                                    isUpdated = true;
+                                                }
+                                                if (!existingEntity.getBranch().equals(citadDTO.getBranch())) {
+                                                    existingEntity.setBranch(citadDTO.getBranch());
+                                                    isUpdated = true;
+                                                }
 
-        logger.info("Local File: " + localFilePath);
-
-        sftpService.downloadFile(REMOTE_FILE_PATH, localFilePath);
-
-        List<CitadReponse> citadDTOs = excelReader.readCitadFromExcel(localFilePath);
-
-        for (CitadReponse citadDTO : citadDTOs) {
-            if (!citadRepo.existsByCode(citadDTO.getCode())) {
-                CitadEntity citadEntity = new CitadEntity();
-                citadEntity.setCode(citadDTO.getCode());
-                citadEntity.setName(citadDTO.getName());
-                citadEntity.setBranch(citadDTO.getBranch());
-
-                logger.info("Citad code " + citadDTO.getCode() + " is created");
-                citadRepo.save(citadEntity);
-            }
-        }
+                                                if (isUpdated) {
+                                                    citadRepo.save(existingEntity);
+                                                    logger.info("Citad code " + citadDTO.getCode() + " is updated");
+                                                }
+                                            }
+                                            return Mono.empty();
+                                        });
+                            })
+                            .thenMany(Flux.defer(() -> Flux.fromIterable(citadRepo.findAll())))
+                            .filter(entity -> !newFileCodes.contains(entity.getCode()) && entity.isActive())
+                            .flatMap(entity -> {
+                                entity.setActive(false);
+                                citadRepo.save(entity);
+                                logger.info("Citad code " + entity.getCode() + " is set to inactive in the database");
+                                return Mono.empty();
+                            })
+                            .then();
+                }).doOnError(e -> logger.error("Error while processing Citad data", e))
+                .doOnSuccess(unused -> logger.info("Citad data sync completed successfully."));
     }
 
     @Override
@@ -145,3 +187,4 @@ public class CitadServiceImpl implements CitadService {
         return Mono.justOrEmpty(citadRepo.findByCode(code));
     }
 }
+
