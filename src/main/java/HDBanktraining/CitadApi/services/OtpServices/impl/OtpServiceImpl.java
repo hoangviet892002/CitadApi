@@ -1,19 +1,26 @@
 package HDBanktraining.CitadApi.services.OtpServices.impl;
 
+import HDBanktraining.CitadApi.configs.ScheduleConfig;
 import HDBanktraining.CitadApi.dtos.response.OtpResponse;
 import HDBanktraining.CitadApi.entities.OtpEntity;
 import HDBanktraining.CitadApi.entities.TransactionEntity;
+import HDBanktraining.CitadApi.quartz.job.OTPCleanupJob;
 import HDBanktraining.CitadApi.repository.OtpRepo.OtpRepo;
 import HDBanktraining.CitadApi.services.OtpServices.OtpService;
 import HDBanktraining.CitadApi.utils.OtpUtil;
+import org.apache.log4j.Logger;
+import org.quartz.*;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 
 @Service
+
 public class OtpServiceImpl implements OtpService {
     private final OtpRepo otpRepo;
+    private final Scheduler scheduler = ScheduleConfig.getScheduler();
 
+    private static final Logger logger = Logger.getLogger(OtpServiceImpl.class);
 
     public OtpServiceImpl(OtpRepo otpRepo) {
         this.otpRepo = otpRepo;
@@ -27,6 +34,46 @@ public class OtpServiceImpl implements OtpService {
         otpEntity.setOtp(OtpUtil.generateOTP());
         OtpEntity newOtp = otpRepo.save(otpEntity);
         OtpResponse otpResponse = new OtpResponse(newOtp.getOtp());
+        try {
+            scheduleOTPCleanup(newOtp);
+        } catch (Exception e) {
+            logger.error("Error when schedule OTP cleanup", e);
+            cleanupOtp(newOtp.getId());
+        }
         return Mono.just(otpResponse);
+    }
+
+    private void scheduleOTPCleanup(OtpEntity otpEntity) throws Exception {
+        logger.info("Schedule OTP cleanup job");
+        JobKey jobKey = new JobKey("otpCleanupJob" + otpEntity.getId(), "otpCleanupGroup");
+        TriggerKey triggerKey = new TriggerKey("otpCleanupTrigger" + otpEntity.getId(), "otpCleanupGroup");
+        // Check if job already exists, delete it
+        if (scheduler.checkExists(jobKey)) {
+            scheduler.deleteJob(jobKey);
+        }
+        JobDetail jobDetail = JobBuilder.newJob(OTPCleanupJob.class)
+                .withIdentity(jobKey)
+                .usingJobData("otpId", otpEntity.getId())
+                .build();
+        // OTP expired time: 10 seconds
+        long OTP_EXPIRED_TIME = 10 * 1000;
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerKey)
+                .startAt(new java.util.Date(System.currentTimeMillis() + OTP_EXPIRED_TIME))
+                .build();
+        scheduler.scheduleJob(jobDetail, trigger);
+        logger.info("Schedule OTP cleanup job success");
+    }
+
+    @Override
+    public void cleanupOtp(String otpId) {
+        OtpEntity otpEntity = otpRepo.findOtpById(otpId);
+        if (otpEntity == null) {
+            logger.info("OTP not found");
+            return;
+        }
+        otpEntity.setActive(false);
+        otpRepo.save(otpEntity);
+        logger.info("OTP cleanup success");
     }
 }

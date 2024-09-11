@@ -4,6 +4,7 @@ import HDBanktraining.CitadApi.entities.CitadEntity;
 import HDBanktraining.CitadApi.services.CitadServices.CitadService;
 import HDBanktraining.CitadApi.services.ClientServices.ClientService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +14,12 @@ public class Runner implements CommandLineRunner {
 
     private static final Logger logger = Logger.getLogger(Runner.class);
 
-    private final CitadService citadService;
-    private final ClientService clientService;
+    @Autowired
+    private  CitadService citadService;
 
-    public Runner(CitadService citadService, ClientService clientService) {
-        this.citadService = citadService;
-        this.clientService = clientService;
-    }
+    @Autowired
+    private  ClientService clientService;
+
 
     @Override
     public void run(String... args) throws Exception {
