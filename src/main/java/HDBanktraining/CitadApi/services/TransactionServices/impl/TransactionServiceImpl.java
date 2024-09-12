@@ -53,11 +53,10 @@ public class TransactionServiceImpl implements TransactionService {
             }
             TransactionEntity transactionEntity = new TransactionEntity(
                     dataTransferRequest.getAmount(),
-                    TransactionEnum.TRANSFER.getValue(),
                     dataTransferRequest.getMessage(),
-                    TransactionStatusEnum.PENDING.getValue(),
-                    receiver,
-                    sender);
+                    TransactionEnum.TRANSFER.getValue(),
+                    sender
+            );
             TransactionEntity newTransaction = transactionRepo.save(transactionEntity);
             OtpResponse otp = otpService.insertOtp(newTransaction).block();
             assert otp != null;

@@ -27,12 +27,6 @@ public class TransactionEntity extends BaseEntity{
     @Column(name = "status")
     private String status;
 
-    @Column(name = "transaction_date", nullable = false)
-    private LocalDateTime transactionDate;
-
-    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
-    private OtpEntity otp;
-
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id", nullable = false)
     private ClientEntity sender;
