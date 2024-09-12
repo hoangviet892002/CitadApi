@@ -138,37 +138,35 @@ public class CitadServiceImpl implements CitadService {
                     Set<String> newFileCodes = citadDTOs.stream().map(CitadReponse::getCode).collect(Collectors.toSet());
 
                     return Flux.fromIterable(citadDTOs)
-                            .flatMap(citadDTO -> {
-                                return Mono.fromCallable(() -> citadRepo.findByCode(citadDTO.getCode()))
-                                        .flatMap(existingEntityOptional -> {
-                                            if (existingEntityOptional.isEmpty()) {
-                                                CitadEntity newEntity = new CitadEntity();
-                                                newEntity.setCode(citadDTO.getCode());
-                                                newEntity.setName(citadDTO.getName());
-                                                newEntity.setBranch(citadDTO.getBranch());
-                                                newEntity.setActive(true);
-                                                citadRepo.save(newEntity);
-                                                logger.info("Citad code " + citadDTO.getCode() + " is created");
-                                            } else {
-                                                CitadEntity existingEntity = existingEntityOptional.get();
-                                                boolean isUpdated = false;
-                                                if (!existingEntity.getName().equals(citadDTO.getName())) {
-                                                    existingEntity.setName(citadDTO.getName());
-                                                    isUpdated = true;
-                                                }
-                                                if (!existingEntity.getBranch().equals(citadDTO.getBranch())) {
-                                                    existingEntity.setBranch(citadDTO.getBranch());
-                                                    isUpdated = true;
-                                                }
-
-                                                if (isUpdated) {
-                                                    citadRepo.save(existingEntity);
-                                                    logger.info("Citad code " + citadDTO.getCode() + " is updated");
-                                                }
+                            .flatMap(citadDTO -> Mono.fromCallable(() -> citadRepo.findByCode(citadDTO.getCode()))
+                                    .flatMap(existingEntity -> {
+                                        if (existingEntity == null) {
+                                            CitadEntity newEntity = new CitadEntity();
+                                            newEntity.setCode(citadDTO.getCode());
+                                            newEntity.setName(citadDTO.getName());
+                                            newEntity.setBranch(citadDTO.getBranch());
+                                            newEntity.setActive(true);
+                                            citadRepo.save(newEntity);
+                                            logger.info("Citad code " + citadDTO.getCode() + " is created");
+                                        } else {
+                                            boolean isUpdated = false;
+                                            if (!existingEntity.getName().equals(citadDTO.getName())) {
+                                                existingEntity.setName(citadDTO.getName());
+                                                isUpdated = true;
                                             }
-                                            return Mono.empty();
-                                        });
-                            })
+                                            if (!existingEntity.getBranch().equals(citadDTO.getBranch())) {
+                                                existingEntity.setBranch(citadDTO.getBranch());
+                                                isUpdated = true;
+                                            }
+
+                                            if (isUpdated) {
+                                                citadRepo.save(existingEntity);
+                                                logger.info("Citad code " + citadDTO.getCode() + " is updated");
+                                            }
+                                        }
+                                        return Mono.empty();
+                                    })
+                            )
                             .thenMany(Flux.defer(() -> Flux.fromIterable(citadRepo.findAll())))
                             .filter(entity -> !newFileCodes.contains(entity.getCode()) && entity.isActive())
                             .flatMap(entity -> {
@@ -181,6 +179,7 @@ public class CitadServiceImpl implements CitadService {
                 }).doOnError(e -> logger.error("Error while processing Citad data", e))
                 .doOnSuccess(unused -> logger.info("Citad data sync completed successfully."));
     }
+
 
     @Override
     public Mono<CitadEntity> queryCitad(String code) {

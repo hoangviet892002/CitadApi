@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Access(AccessType.FIELD)
 public class BaseEntity {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,4 +41,5 @@ public class BaseEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
 }

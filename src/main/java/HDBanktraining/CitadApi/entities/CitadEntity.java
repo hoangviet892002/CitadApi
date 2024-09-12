@@ -1,9 +1,6 @@
 package HDBanktraining.CitadApi.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,14 +19,20 @@ public class CitadEntity extends BaseEntity {
 
     @Column(name = "code")
     private String code;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "branch")
     private String branch;
 
     @OneToMany(mappedBy = "citad")
     private List<ClientEntity> clients;
 
+    @OneToMany(mappedBy = "atm_bank_id")
+    private List<CitadEntity> atmBank;
+
     public CitadEntity(String code, String name, String branch) {
     }
+
 }

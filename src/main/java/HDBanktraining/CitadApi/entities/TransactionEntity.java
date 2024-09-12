@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -17,20 +18,23 @@ import java.util.List;
 @Table(name = "transaction")
 public class TransactionEntity extends BaseEntity{
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private double amount;
-    @Column(name = "type")
-    private String type;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "status")
     private String status;
-    @ManyToOne
-    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
-    private ClientEntity receiver;
-    @ManyToOne
-    @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private ClientEntity sender;
 
+    @Column(name = "transaction_date", nullable = false)
+    private LocalDateTime transactionDate;
+
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    private OtpEntity otp;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id", referencedColumnName = "id", nullable = false)
+    private ClientEntity sender;
 
 }

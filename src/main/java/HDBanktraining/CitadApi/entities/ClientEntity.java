@@ -19,25 +19,31 @@ public class ClientEntity extends BaseEntity {
 
     @Column(name = "name")
     private String name;
+
     @Column(name = "email")
     private String email;
+
     @Column(name = "phone")
     private String phone;
+
     @Column(name = "address")
     private String address;
+
     @Column(name = "dob")
     private String dob;
+
     @Column(name = "wallet")
     private double wallet;
-    @OneToMany(mappedBy = "sender")
-    private List<TransactionEntity> sentTransactions;
-    @OneToMany(mappedBy = "receiver")
-    private List<TransactionEntity> receivedTransactions;
+
     @ManyToOne
-    @JoinColumn(name = "citad_id", referencedColumnName = "id")
+    @JoinColumn(name = "citad_id", referencedColumnName = "id", nullable = false)
     private CitadEntity citad;
 
+    @OneToMany(mappedBy = "sender")
+    private List<TransactionEntity> sentTransfers;
 
+    @OneToMany(mappedBy = "receiver")
+    private List<TransferTransactionEntity> receivedTransfers;
 
     public static ClientEntity DefaultEntites(CitadEntity citad) {
         ClientEntity clientEntity = new ClientEntity();

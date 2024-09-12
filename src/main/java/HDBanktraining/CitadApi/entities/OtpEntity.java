@@ -14,9 +14,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "otp")
 public class OtpEntity extends BaseEntity{
+
     @Column(name = "otp")
     private String otp;
+
     @OneToOne
     @JoinColumn(name = "transaction", referencedColumnName = "id")
     private TransactionEntity transaction;
+
 }
