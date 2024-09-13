@@ -1,0 +1,12 @@
+package HDBanktraining.CitadApi.repository.TransferTransactionRepo;
+
+import HDBanktraining.CitadApi.entities.TransferTransactionEntity;
+import HDBanktraining.CitadApi.repository.TransferTransactionRepo.operations.TransferTransactionCreateRepository;
+import HDBanktraining.CitadApi.repository.TransferTransactionRepo.operations.TransferTransactionDeleteRepository;
+import HDBanktraining.CitadApi.repository.TransferTransactionRepo.operations.TransferTransactionReadRepository;
+import HDBanktraining.CitadApi.repository.TransferTransactionRepo.operations.TransferTransactionUpdateRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TransferTransactionRepo extends JpaRepository<TransferTransactionEntity, Long>
+        , TransferTransactionCreateRepository, TransferTransactionDeleteRepository, TransferTransactionReadRepository, TransferTransactionUpdateRepository {
+}

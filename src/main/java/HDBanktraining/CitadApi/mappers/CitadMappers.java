@@ -22,4 +22,9 @@ public class CitadMappers {
         return new CitadEntity(citadRequest.getCode(), citadRequest.getName(), citadRequest.getBranch());
     }
 
+    public List<CitadEntity> citadRequestToEntity(List<CitadRequest> citadRequests) {
+        return citadRequests.stream().map(this::citadRequestToEntity).collect(Collectors.toList());
+    }
+
+
 }
