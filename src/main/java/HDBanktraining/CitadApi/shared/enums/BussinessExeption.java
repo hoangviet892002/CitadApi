@@ -16,7 +16,8 @@ public enum BussinessExeption {
     ACCOUNT_RECEIVER_NOT_FOUND("ACCOUNT_RECEIVER_NOT_FOUND", "Account receiver not found"),
     ACCOUNT_RECEIVER_NOT_ACTIVE("ACCOUNT_RECEIVER_NOT_ACTIVE", "Account receiver not active"),
     ACCOUNT_NOT_BALANCE("ACCOUNT_NOT_BALANCE", "Account not balance"),
-    ACCOUNT_NOT_ACTIVE_OR_BALANCE("ACCOUNT_NOT_ACTIVE_OR_BALANCE", "Account not active or balance");
+    ACCOUNT_NOT_ACTIVE_OR_BALANCE("ACCOUNT_NOT_ACTIVE_OR_BALANCE", "Account not active or balance"),
+    OTP_NOT_CORRECT("OTP_NOT_CORRECT", "Otp not correct");
     private final String message;
     private final String description;
 }

@@ -25,4 +25,9 @@ public class TranferTransactionImpl  implements TranferTransactionService {
         TransferTransactionEntity  newTransfer =  transferTransactionRepo.save(transferTransactionEntity);
         return Mono.empty();
     }
+
+    @Override
+    public Mono<TransferTransactionEntity> getTransactionById(String id) {
+        return Mono.just(transferTransactionRepo.findByTransactionId(id));
+    }
 }

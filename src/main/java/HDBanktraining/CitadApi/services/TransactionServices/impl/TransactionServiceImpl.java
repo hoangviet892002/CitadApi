@@ -1,13 +1,16 @@
 package HDBanktraining.CitadApi.services.TransactionServices.impl;
 
 
+import HDBanktraining.CitadApi.dtos.request.AcceptTransferRequest;
 import HDBanktraining.CitadApi.dtos.request.DataTransferRequest;
+import HDBanktraining.CitadApi.dtos.response.AcceptTransferResponse;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.OtpResponse;
 import HDBanktraining.CitadApi.dtos.response.TransferResponse;
 import HDBanktraining.CitadApi.entities.ClientEntity;
 import HDBanktraining.CitadApi.entities.OtpEntity;
 import HDBanktraining.CitadApi.entities.TransactionEntity;
+import HDBanktraining.CitadApi.entities.TransferTransactionEntity;
 import HDBanktraining.CitadApi.repository.TransactionRepo.TransactionRepo;
 import HDBanktraining.CitadApi.repository.TransferTransactionRepo.TransferTransactionRepo;
 import HDBanktraining.CitadApi.services.ClientServices.ClientService;
@@ -108,7 +111,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Mono<Void> updateTransaction(TransactionEntity transaction) {
-        return Mono.fromRunnable(() -> transactionRepo.save(transaction));
+        transactionRepo.save(transaction);
+        return Mono.empty();
     }
 
     @Override
@@ -135,5 +139,85 @@ public class TransactionServiceImpl implements TransactionService {
             baseReponse.setMessage(ResponseEnum.INTERNAL_ERROR.getMessage());
             return Mono.just(baseReponse);
         }
+    }
+
+    @Override
+    public Mono<BaseReponse<AcceptTransferResponse>> acceptTransfer(AcceptTransferRequest acceptTransferRequest) {
+            // find transaction
+            TransactionEntity transaction = transactionRepo.findById(acceptTransferRequest.getTransactionId());
+            if (transaction == null) {
+                return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                        responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode())
+                        .message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+            }
+            // find otp
+        boolean checkOtp = false;
+        try {
+            checkOtp = Boolean.TRUE.equals(otpService.checkOtp(transaction.getId(), acceptTransferRequest.getOtp()).block());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (!checkOtp) {
+            return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.OTP_NOT_CORRECT.getMessage()).build());
+        }
+        // find Transfer
+        TransferTransactionEntity transfer = tranferTransactionService.getTransactionById(transaction.getId()).block();
+        if (transfer == null) {
+            updateStatusTransaction(transaction, TransactionStatusEnum.FAILED).block();
+            return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                    responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode())
+                    .message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+        }
+        // get sender and receiver
+        ClientEntity sender =  transaction.getSender();
+        ClientEntity receiver = transfer.getReceiver();
+        //check validate account not null or active
+        if (sender == null || receiver == null) {
+            updateStatusTransaction(transaction, TransactionStatusEnum.FAILED).block();
+            return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                    responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode())
+                    .message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+        }
+        if (!sender.isActive() || !receiver.isActive()){
+            updateStatusTransaction(transaction, TransactionStatusEnum.FAILED).block();
+            return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.ACCOUNT_NOT_ACTIVE.getMessage()).build());
+        }
+
+
+        // check balance
+        boolean checkBalance = Boolean.TRUE.equals(clientService.checkBalance(sender.getId(), transaction.getAmount()).block());
+        if (!checkBalance) {
+            updateStatusTransaction(transaction, TransactionStatusEnum.FAILED).block();
+            return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.ACCOUNT_NOT_BALANCE.getMessage()).build());
+        }
+
+        Mono.zip(
+                // update balance
+                clientService.updateBalance(sender, transaction.getAmount(), Boolean.FALSE),
+                clientService.updateBalance(receiver, transaction.getAmount(), Boolean.TRUE),
+                // update status transaction
+                updateStatusTransaction(transaction, TransactionStatusEnum.SUCCESS)).then()
+                .doOnError(e -> {
+                    updateStatusTransaction(transaction, TransactionStatusEnum.FAILED).block();
+                    logger.error(e.getMessage());
+                }).subscribe();
+
+        // done
+        return Mono.just(BaseReponse.<AcceptTransferResponse>builder().
+                responseCode(ResponseEnum.SUCCESS.getResponseCode())
+                .message(ResponseEnum.SUCCESS.getMessage()).build());
+
+    }
+
+    public  Mono<Void> updateStatusTransaction(TransactionEntity transaction, TransactionStatusEnum status) {
+        transaction.setStatus(status.getValue());
+        transactionRepo.save(transaction);
+        return Mono.empty();
     }
 }

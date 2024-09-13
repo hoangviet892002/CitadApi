@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface QueryOtpService {
     Mono<OtpEntity> findByTransactionId(TransactionEntity transactionId);
+
+    Mono<Boolean> checkOtp(String transactionId, String otp) throws Exception;
 }

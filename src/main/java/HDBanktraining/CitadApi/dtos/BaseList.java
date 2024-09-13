@@ -1,4 +1,4 @@
-package HDBanktraining.CitadApi.dtos.response;
+package HDBanktraining.CitadApi.dtos;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

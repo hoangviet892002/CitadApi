@@ -34,5 +34,10 @@ public class Runner implements CommandLineRunner {
             clientService.insertClient(citadEntity).block();
             logger.info("Insert client success");
         }
+        else {
+            CitadEntity citadEntity1 = new CitadEntity("79321001", "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh (Ho Chi Minh Development Bank)", "Tất cả (All branches)");
+            citadService.insertCitadData(citadEntity1).block();
+            logger.info("Citad not found");
+        }
     }
 }

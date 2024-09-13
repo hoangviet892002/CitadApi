@@ -22,6 +22,8 @@ public class ClientEntity extends BaseEntity {
 
     @Column(name = "email")
     private String email;
+    @Column(name="number")
+    private String number;
 
     @Column(name = "phone")
     private String phone;
@@ -48,11 +50,12 @@ public class ClientEntity extends BaseEntity {
     public static ClientEntity DefaultEntites(CitadEntity citad) {
         ClientEntity clientEntity = new ClientEntity();
         clientEntity.setCitad(citad);
-        clientEntity.setAddress("address2");
-        clientEntity.setEmail("email2");
-        clientEntity.setName("name2");
-        clientEntity.setPhone("phone2");
+        clientEntity.setAddress("address");
+        clientEntity.setEmail("email11");
+        clientEntity.setName("viet");
+        clientEntity.setPhone("phone");
         clientEntity.setDob("dob");
+        clientEntity.setNumber("viet");
         clientEntity.setWallet(0);
         return clientEntity;
     }

@@ -55,4 +55,15 @@ public class ClientServiceImpl implements ClientService {
         }
         return Mono.just(clientEntity);
     }
+
+    @Override
+    public Mono<Void> updateBalance(ClientEntity client, double amount, boolean isDeposit) {
+        if (isDeposit) {
+            client.setWallet(client.getWallet() + amount);
+        } else {
+            client.setWallet(client.getWallet() - amount);
+        }
+        clientRepo.save(client);
+        return Mono.empty();
+    }
 }

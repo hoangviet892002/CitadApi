@@ -60,7 +60,7 @@ public class OtpServiceImpl implements OtpService {
                 .withIdentity(jobKey)
                 .usingJobData("otpId", otpEntity.getId())
                 .build();
-        // OTP expired time: 10 seconds
+        // OTP expired time: 5 minutes
         long OTP_EXPIRED_TIME = 10 * 1000;
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
@@ -79,9 +79,10 @@ public class OtpServiceImpl implements OtpService {
         }
         TransactionEntity transactionEntity = otpEntity.getTransaction();
         transactionEntity.setStatus(TransactionStatusEnum.FAILED.getValue());
-        transactionService.updateTransaction(transactionEntity);
         otpEntity.setActive(false);
-        otpRepo.save(otpEntity);
+        Mono.zip( transactionService.updateTransaction(transactionEntity),
+                Mono.fromCallable(() -> otpRepo.save(otpEntity))
+        ).block();
         logger.info("OTP cleanup success");
     }
 
@@ -107,5 +108,35 @@ public class OtpServiceImpl implements OtpService {
             cleanupOtp(newOtp.getId());
         }
         return Mono.just(otpResponse);
+    }
+
+
+
+    @Override
+    public Mono<Boolean> checkOtp(String transactionId, String otp) throws Exception {
+        OtpEntity otpEntity = otpRepo.findOtpByTransactionId(transactionId);
+        if (otpEntity == null) {
+            return Mono.just(false);
+        }
+        if (!otpEntity.isActive()) {
+            return Mono.just(false);
+        }
+        if (!otpEntity.getOtp().equals(otp)) {
+            return Mono.just(false);
+        }
+        cancleScheduleOTPCleanup(otpEntity);
+        otpEntity.setActive(false);
+        otpRepo.save(otpEntity);
+        return Mono.just(true);
+    }
+    private void cancleScheduleOTPCleanup(OtpEntity otpEntity) throws Exception {
+        logger.info("Cancel schedule OTP cleanup job");
+        JobKey jobKey = new JobKey("otpCleanupJob" + otpEntity.getId(), "otpCleanupGroup");
+        TriggerKey triggerKey = new TriggerKey("otpCleanupTrigger" + otpEntity.getId(), "otpCleanupGroup");
+        // Check if job already exists, delete it
+        if (scheduler.checkExists(jobKey)) {
+            scheduler.deleteJob(jobKey);
+        }
+        logger.info("Cancel schedule OTP cleanup job success");
     }
 }

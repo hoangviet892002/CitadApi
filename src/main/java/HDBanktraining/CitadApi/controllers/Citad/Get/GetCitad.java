@@ -1,7 +1,7 @@
 package HDBanktraining.CitadApi.controllers.Citad.Get;
 
 
-import HDBanktraining.CitadApi.dtos.response.BaseList;
+import HDBanktraining.CitadApi.dtos.BaseList;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.CitadReponse;
 import HDBanktraining.CitadApi.services.CitadServices.CitadService;
