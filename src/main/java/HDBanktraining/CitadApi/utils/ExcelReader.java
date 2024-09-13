@@ -1,6 +1,7 @@
 package HDBanktraining.CitadApi.utils;
 
 import HDBanktraining.CitadApi.dtos.response.CitadReponse;
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExcelReader {
-
+    private static final Logger logger = Logger.getLogger(ExcelReader.class);
     public List<CitadReponse> readCitadFromExcel(String filePath) throws IOException {
+
         List<CitadReponse> citadReponses = new ArrayList<>();
 
         FileInputStream fileInputStream = new FileInputStream(filePath);

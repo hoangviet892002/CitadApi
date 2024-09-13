@@ -1,6 +1,6 @@
 package HDBanktraining.CitadApi.services.CitadServices.impl;
 
-import HDBanktraining.CitadApi.dtos.response.BaseList;
+import HDBanktraining.CitadApi.dtos.BaseList;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.CitadReponse;
 import HDBanktraining.CitadApi.entities.CitadEntity;
@@ -184,6 +184,19 @@ public class CitadServiceImpl implements CitadService {
     @Override
     public Mono<CitadEntity> queryCitad(String code) {
         return Mono.justOrEmpty(citadRepo.findByCode(code));
+    }
+    @Override
+    public Mono<Void> insertCitadData( CitadEntity citadEntity) throws IOException {
+
+        CitadEntity existCitad = citadRepo.findByCode(citadEntity.getCode());
+        if (existCitad != null) {
+            logger.info("Citad already exist");
+            return Mono.empty();
+        }
+        citadRepo.save(citadEntity);
+        logger.info("Insert citad success");
+        return Mono.empty();
+
     }
 }
 

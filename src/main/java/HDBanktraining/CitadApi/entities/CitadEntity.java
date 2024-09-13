@@ -33,6 +33,9 @@ public class CitadEntity extends BaseEntity {
     private List<WithdrawalTransactionEntity> withdrawalTransactions;
 
     public CitadEntity(String code, String name, String branch) {
+        this.code = code;
+        this.name = name;
+        this.branch = branch;
     }
 
 }
