@@ -26,7 +26,8 @@ public class TransactionEntity extends BaseEntity{
 
     @Column(name = "status")
     private String status;
-
+    @Column(name = "type")
+    private String type;
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id", nullable = false)
     private ClientEntity sender;

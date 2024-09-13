@@ -3,6 +3,7 @@ package HDBanktraining.CitadApi.services.TransactionServices;
 
 import HDBanktraining.CitadApi.services.TransactionServices.operations.InsertTransactionService;
 import HDBanktraining.CitadApi.services.TransactionServices.operations.QueryTransactionService;
+import HDBanktraining.CitadApi.services.TransactionServices.operations.UpdateTransactionService;
 
-public interface TransactionService extends InsertTransactionService, QueryTransactionService {
+public interface TransactionService extends InsertTransactionService, QueryTransactionService , UpdateTransactionService {
 }

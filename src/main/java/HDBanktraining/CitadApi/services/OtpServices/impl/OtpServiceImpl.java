@@ -7,9 +7,12 @@ import HDBanktraining.CitadApi.entities.TransactionEntity;
 import HDBanktraining.CitadApi.quartz.job.OTPCleanupJob;
 import HDBanktraining.CitadApi.repository.OtpRepo.OtpRepo;
 import HDBanktraining.CitadApi.services.OtpServices.OtpService;
+import HDBanktraining.CitadApi.services.TransactionServices.TransactionService;
+import HDBanktraining.CitadApi.shared.enums.TransactionStatusEnum;
 import HDBanktraining.CitadApi.utils.OtpUtil;
 import org.apache.log4j.Logger;
 import org.quartz.*;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,12 +21,14 @@ import reactor.core.publisher.Mono;
 
 public class OtpServiceImpl implements OtpService {
     private final OtpRepo otpRepo;
+    private final TransactionService transactionService;
     private final Scheduler scheduler = ScheduleConfig.getScheduler();
 
     private static final Logger logger = Logger.getLogger(OtpServiceImpl.class);
 
-    public OtpServiceImpl(OtpRepo otpRepo) {
+    public OtpServiceImpl(OtpRepo otpRepo,@Lazy TransactionService transactionService) {
         this.otpRepo = otpRepo;
+        this.transactionService = transactionService;
     }
 
 
@@ -72,8 +77,35 @@ public class OtpServiceImpl implements OtpService {
             logger.info("OTP not found");
             return;
         }
+        TransactionEntity transactionEntity = otpEntity.getTransaction();
+        transactionEntity.setStatus(TransactionStatusEnum.FAILED.getValue());
+        transactionService.updateTransaction(transactionEntity);
         otpEntity.setActive(false);
         otpRepo.save(otpEntity);
         logger.info("OTP cleanup success");
+    }
+
+    @Override
+    public Mono<OtpEntity> findByTransactionId(TransactionEntity transactionId) {
+        return Mono.just(otpRepo.findOtpByTransactionId(transactionId.getId()));
+    }
+
+    @Override
+    public Mono<OtpResponse> resetOtp(TransactionEntity transactionEntity) {
+        OtpEntity otpEntity = otpRepo.findOtpByTransactionId(transactionEntity.getId());
+        if (otpEntity == null) {
+            return insertOtp(transactionEntity);
+        }
+        otpEntity.setOtp(OtpUtil.generateOTP());
+        otpEntity.setActive(true);
+        OtpEntity newOtp = otpRepo.save(otpEntity);
+        OtpResponse otpResponse = new OtpResponse(newOtp.getOtp());
+        try {
+            scheduleOTPCleanup(newOtp);
+        } catch (Exception e) {
+            logger.error("Error when schedule OTP cleanup", e);
+            cleanupOtp(newOtp.getId());
+        }
+        return Mono.just(otpResponse);
     }
 }

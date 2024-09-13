@@ -6,30 +6,37 @@ import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.OtpResponse;
 import HDBanktraining.CitadApi.dtos.response.TransferResponse;
 import HDBanktraining.CitadApi.entities.ClientEntity;
+import HDBanktraining.CitadApi.entities.OtpEntity;
 import HDBanktraining.CitadApi.entities.TransactionEntity;
 import HDBanktraining.CitadApi.repository.TransactionRepo.TransactionRepo;
+import HDBanktraining.CitadApi.repository.TransferTransactionRepo.TransferTransactionRepo;
 import HDBanktraining.CitadApi.services.ClientServices.ClientService;
 import HDBanktraining.CitadApi.services.OtpServices.OtpService;
+import HDBanktraining.CitadApi.services.TranferTransactionService.TranferTransactionService;
 import HDBanktraining.CitadApi.services.TransactionServices.TransactionService;
+import HDBanktraining.CitadApi.shared.enums.BussinessExeption;
 import HDBanktraining.CitadApi.shared.enums.ResponseEnum;
 import HDBanktraining.CitadApi.shared.enums.TransactionEnum;
 import HDBanktraining.CitadApi.shared.enums.TransactionStatusEnum;
 import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 
 @Service
-
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepo transactionRepo;
+
+    private final TranferTransactionService tranferTransactionService;
     private final ClientService clientService;
     private final OtpService otpService;
     private static final Logger logger = Logger.getLogger(TransactionServiceImpl.class);
 
-    public TransactionServiceImpl(TransactionRepo transactionRepo, ClientService clientService, OtpService otpService) {
+    public TransactionServiceImpl(TransactionRepo transactionRepo, TransferTransactionRepo transferTransactionRepo, TranferTransactionService tranferTransactionService, ClientService clientService,@Lazy OtpService otpService) {
         this.transactionRepo = transactionRepo;
+        this.tranferTransactionService = tranferTransactionService;
         this.clientService = clientService;
         this.otpService = otpService;
     }
@@ -38,31 +45,26 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<BaseReponse<TransferResponse>> insertTransaction(DataTransferRequest dataTransferRequest) {
         BaseReponse<TransferResponse> baseReponse = new BaseReponse<TransferResponse>();
         try {
-            boolean checkBalance = Boolean.TRUE.equals(clientService.checkBalance(dataTransferRequest.getSender(), dataTransferRequest.getAmount()).block());
-            if (!checkBalance) {
-                baseReponse.setResponseCode(ResponseEnum.INSUFFICIENT_BALANCE.getResponseCode());
-                baseReponse.setMessage(ResponseEnum.INSUFFICIENT_BALANCE.getMessage());
-                return Mono.just(baseReponse);
-            }
             ClientEntity sender = clientService.getClientById(dataTransferRequest.getSender()).block();
             ClientEntity receiver = clientService.getClientById(dataTransferRequest.getReceiver()).block();
-            if (sender == null || receiver == null) {
-                baseReponse.setResponseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode());
-                baseReponse.setMessage(ResponseEnum.DATA_NOT_FOUND.getMessage());
-                return Mono.just(baseReponse);
+            Mono<BaseReponse<TransferResponse>> validate = checkValidateTransaction(sender, receiver, dataTransferRequest.getAmount());
+            if (validate.block() != null) {
+                return validate;
             }
+
             TransactionEntity transactionEntity = new TransactionEntity(
                     dataTransferRequest.getAmount(),
                     dataTransferRequest.getMessage(),
+                    TransactionStatusEnum.PENDING.getValue(),
                     TransactionEnum.TRANSFER.getValue(),
                     sender
             );
             TransactionEntity newTransaction = transactionRepo.save(transactionEntity);
+            tranferTransactionService.insert(newTransaction,receiver);
             OtpResponse otp = otpService.insertOtp(newTransaction).block();
             assert otp != null;
             TransferResponse transferResponse = new TransferResponse(transactionEntity.getDescription(), transactionEntity.getId(), otp.getOtp());
             baseReponse.setData(transferResponse);
-            // set cron job for otp expired and close transaction
 
             baseReponse.setResponseCode(ResponseEnum.SUCCESS.getResponseCode());
             baseReponse.setMessage(ResponseEnum.SUCCESS.getMessage());
@@ -73,6 +75,65 @@ public class TransactionServiceImpl implements TransactionService {
             baseReponse.setMessage(ResponseEnum.INTERNAL_ERROR.getMessage());
             return Mono.just(baseReponse);
         }
+    }
 
+    private  Mono<BaseReponse<TransferResponse>> checkValidateTransaction(ClientEntity sender, ClientEntity receiver, double amount) {
+        if (sender == null || receiver == null) {
+            return Mono.just(BaseReponse.<TransferResponse>builder().
+                    responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode())
+                    .message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+        }
+        if (!sender.isActive()){
+            return Mono.just(BaseReponse.<TransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.ACCOUNT_NOT_ACTIVE.getMessage()).build());
+        }
+        if (!receiver.isActive()){
+            return Mono.just(BaseReponse.<TransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.ACCOUNT_NOT_ACTIVE.getMessage()).build());
+        }
+        boolean checkBalance = Boolean.TRUE.equals(clientService.checkBalance(sender.getId(), amount).block());
+        if (!checkBalance) {
+            return Mono.just(BaseReponse.<TransferResponse>builder().
+                    responseCode(ResponseEnum.BIZ_ERROR.getResponseCode())
+                    .message(BussinessExeption.ACCOUNT_NOT_BALANCE.getMessage()).build());
+        }
+        return Mono.empty();
+    }
+    @Override
+    public Mono<TransactionEntity> queryTransaction(String transactionId) {
+        return Mono.just(transactionRepo.findById(transactionId));
+    }
+
+    @Override
+    public Mono<Void> updateTransaction(TransactionEntity transaction) {
+        return Mono.fromRunnable(() -> transactionRepo.save(transaction));
+    }
+
+    @Override
+    public Mono<BaseReponse<TransferResponse>> resendOtp(String transactionId) {
+        BaseReponse<TransferResponse> baseReponse = new BaseReponse<TransferResponse>();
+        try {
+            TransactionEntity transaction = transactionRepo.findById(transactionId);
+            if (transaction == null) {
+                baseReponse.setResponseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode());
+                baseReponse.setMessage(ResponseEnum.DATA_NOT_FOUND.getMessage());
+                return Mono.just(baseReponse);
+            }
+            // find Otp of transaction
+            OtpResponse otp = otpService.resetOtp(transaction).block();
+            assert otp != null;
+            TransferResponse transferResponse = new TransferResponse(transaction.getDescription(), transaction.getId(), otp.getOtp());
+            baseReponse.setData(transferResponse);
+            baseReponse.setResponseCode(ResponseEnum.SUCCESS.getResponseCode());
+            baseReponse.setMessage(ResponseEnum.SUCCESS.getMessage());
+            return Mono.just(baseReponse);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            baseReponse.setResponseCode(ResponseEnum.INTERNAL_ERROR.getResponseCode());
+            baseReponse.setMessage(ResponseEnum.INTERNAL_ERROR.getMessage());
+            return Mono.just(baseReponse);
+        }
     }
 }

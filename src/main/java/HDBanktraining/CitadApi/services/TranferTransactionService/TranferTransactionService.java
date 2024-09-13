@@ -1,0 +1,9 @@
+package HDBanktraining.CitadApi.services.TranferTransactionService;
+
+import HDBanktraining.CitadApi.services.TranferTransactionService.operation.TranferTransactionDelete;
+import HDBanktraining.CitadApi.services.TranferTransactionService.operation.TranferTransactionInsert;
+import HDBanktraining.CitadApi.services.TranferTransactionService.operation.TranferTransactionQuery;
+import HDBanktraining.CitadApi.services.TranferTransactionService.operation.TranferTransactionUpdate;
+
+public interface TranferTransactionService extends TranferTransactionInsert, TranferTransactionQuery, TranferTransactionUpdate, TranferTransactionDelete {
+}

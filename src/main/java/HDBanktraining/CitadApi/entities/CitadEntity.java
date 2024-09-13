@@ -29,8 +29,8 @@ public class CitadEntity extends BaseEntity {
     @OneToMany(mappedBy = "citad")
     private List<ClientEntity> clients;
 
-    @OneToMany(mappedBy = "atm_bank_id")
-    private List<CitadEntity> atmBank;
+    @OneToMany(mappedBy = "atmBank")
+    private List<WithdrawalTransactionEntity> withdrawalTransactions;
 
     public CitadEntity(String code, String name, String branch) {
     }

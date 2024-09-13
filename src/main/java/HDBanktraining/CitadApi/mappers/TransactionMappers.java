@@ -9,7 +9,6 @@ public class TransactionMappers {
     public TransactionEntity toTransactionEntity(DataTransferRequest request, ClientEntity sender, ClientEntity receiver) {
         TransactionEntity transaction = new TransactionEntity();
         transaction.setSender(sender);
-        transaction.setReceiver(receiver);
         transaction.setAmount(request.getAmount());
         transaction.setDescription(request.getMessage());
         transaction.setType("TRANSFER");
