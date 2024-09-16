@@ -41,8 +41,8 @@ public class HashCodeFilter extends OncePerRequestFilter {
         }
 
         try {
-            String key = request.getHeader("Api-Key");
-//            String key = "HashCodeKey";
+//            String key = request.getHeader("Api-Key");
+            String key = "HashCodeKey";
 
             if (key == null) {
                 logger.info("No valid Key provided");

@@ -6,4 +6,6 @@ public interface ClientReadRepository {
     ClientEntity findByEmail(String email);
 
     ClientEntity findById(String clientId);
+
+    ClientEntity findByNumber(String number);
 }

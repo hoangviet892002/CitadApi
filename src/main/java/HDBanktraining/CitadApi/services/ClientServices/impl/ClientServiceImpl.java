@@ -1,7 +1,9 @@
 package HDBanktraining.CitadApi.services.ClientServices.impl;
 
+import HDBanktraining.CitadApi.dtos.response.ClientResponse;
 import HDBanktraining.CitadApi.entities.CitadEntity;
 import HDBanktraining.CitadApi.entities.ClientEntity;
+import HDBanktraining.CitadApi.mappers.ClientMappers;
 import HDBanktraining.CitadApi.repository.ClientRepo.ClientRepo;
 import HDBanktraining.CitadApi.services.ClientServices.ClientService;
 import org.apache.log4j.Logger;
@@ -13,10 +15,12 @@ import reactor.core.publisher.Mono;
 @Service
 public class ClientServiceImpl implements ClientService {
     private final ClientRepo clientRepo;
+    private final ClientMappers clientMappers;
 
     private static final Logger logger = Logger.getLogger(ClientServiceImpl.class);
-    public ClientServiceImpl(ClientRepo clientRepo) {
+    public ClientServiceImpl(ClientRepo clientRepo, ClientMappers clientMappers) {
         this.clientRepo = clientRepo;
+        this.clientMappers = clientMappers;
     }
 
     @Override
@@ -54,6 +58,17 @@ public class ClientServiceImpl implements ClientService {
             return Mono.empty();
         }
         return Mono.just(clientEntity);
+    }
+
+    @Override
+    public Mono<ClientResponse> getClientByNumber(String number) {
+        try {
+            ClientResponse clientResponse = clientMappers.entityToResponse(clientRepo.findByNumber(number));
+
+            return Mono.just(clientResponse);
+        }catch (Exception e) {
+            return Mono.empty();
+        }
     }
 
     @Override
