@@ -22,6 +22,7 @@ public class ClientEntity extends BaseEntity {
 
     @Column(name = "email")
     private String email;
+
     @Column(name="number")
     private String number;
 

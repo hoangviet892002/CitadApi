@@ -3,6 +3,7 @@ package HDBanktraining.CitadApi.services.NapasServices.impl;
 
 import HDBanktraining.CitadApi.dtos.BaseList;
 import HDBanktraining.CitadApi.dtos.napasDto.response.Bank;
+import HDBanktraining.CitadApi.dtos.napasDto.response.Client;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.services.NapasServices.NapasService;
 import HDBanktraining.CitadApi.shared.enums.ResponseEnum;
@@ -27,5 +28,15 @@ public class NapasServiceImpl  implements NapasService {
             return Mono.just(BaseReponse.<BaseList<Bank>>builder().responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode()).message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
         }
         return Mono.just(BaseReponse.<BaseList<Bank>>builder().responseCode(ResponseEnum.SUCCESS.getResponseCode()).message(ResponseEnum.SUCCESS.getMessage()).data(banks).build());
+    }
+
+    @Override
+    public Mono<BaseReponse<Client>> getClient(String number) {
+        Client client = restTemplate.getForObject(NAPAS_API + "client?number=" + number, Client.class);
+
+        if (Objects.isNull(client)) {
+            return Mono.just(BaseReponse.<Client>builder().responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode()).message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+        }
+        return Mono.just(BaseReponse.<Client>builder().responseCode(ResponseEnum.SUCCESS.getResponseCode()).message(ResponseEnum.SUCCESS.getMessage()).data(client).build());
     }
 }

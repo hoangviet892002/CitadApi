@@ -186,7 +186,6 @@ public class CitadServiceImpl implements CitadService {
         });
     }
 
-
     @Override
     public Mono<CitadEntity> queryCitad(String code) {
         return Mono.justOrEmpty(citadRepo.findByCode(code));
