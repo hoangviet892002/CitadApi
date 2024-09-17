@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  sftp:
+    host: 103.214.8.153
+    port: 22
+    user: testuser
+    password: testpassword
+    remote-directory: /test/directory
+    local-directory: /test/local/directory
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test@mail.com
+    password: testpassword

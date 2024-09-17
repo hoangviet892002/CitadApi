@@ -1,4 +1,4 @@
-package HDBanktraining.CitadApi.services.TransactionServices.operations;
+package HDBanktraining.CitadApi.services.WithdrawalsTransactionService;
 
 import HDBanktraining.CitadApi.dtos.request.DataTransferRequest;
 import HDBanktraining.CitadApi.dtos.response.BaseReponse;

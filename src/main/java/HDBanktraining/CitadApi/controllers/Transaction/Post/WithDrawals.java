@@ -24,8 +24,7 @@ public class WithDrawals {
 
     @PostMapping("/withdrawals")
     public Mono<BaseReponse<TransferResponse>> withdrawals(
-            @RequestBody DataTransferRequest dataTransferRequest,
-            @RequestHeader("Authorization") String authToken) {
+            @RequestBody DataTransferRequest dataTransferRequest) {
         // Xác thực User
         // Kiểm tra authorization
         // Xác thực 2 yếu tố
