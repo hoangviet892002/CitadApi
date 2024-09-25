@@ -30,7 +30,7 @@ public class GetNapasInformation {
     }
 
     @GetMapping("/client")
-    public Mono<BaseReponse<Client>> getClient(@RequestParam String number) {
-        return napasService.getClient(number);
+    public Mono<BaseReponse<Client>> getClient(@RequestParam String number, @RequestParam String bankCode) {
+        return napasService.getClient(number, bankCode);
     }
 }

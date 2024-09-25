@@ -31,8 +31,8 @@ public class NapasServiceImpl  implements NapasService {
     }
 
     @Override
-    public Mono<BaseReponse<Client>> getClient(String number) {
-        Client client = restTemplate.getForObject(NAPAS_API + "client?number=" + number, Client.class);
+    public Mono<BaseReponse<Client>> getClient(String number, String bankCode) {
+        Client client = restTemplate.getForObject(NAPAS_API + "client?number=" + number + "&bank=" + bankCode, Client.class);
 
         if (Objects.isNull(client)) {
             return Mono.just(BaseReponse.<Client>builder().responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode()).message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());

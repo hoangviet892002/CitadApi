@@ -10,5 +10,5 @@ public interface NapasService {
 
      Mono<BaseReponse<BaseList<Bank>>> getBanks();
 
-     Mono<BaseReponse<Client>> getClient(String number);
+     Mono<BaseReponse<Client>> getClient(String number, String bankCode);
 }
