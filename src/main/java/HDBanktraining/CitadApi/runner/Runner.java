@@ -25,32 +25,32 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        citadService.queryCitad("79321001")
-                .doOnNext(citadEntity -> {
-                    if (citadEntity != null) {
-                        logger.info("Citad already exists");
-                        clientService.insertClient(citadEntity)
-                                .doOnSuccess(v -> logger.info("Insert client success"))
-                                .doOnError(e -> logger.error("Error inserting client", e))
-                                .subscribe();
-                    } else {
-                        CitadEntity newCitadEntity = new CitadEntity(
-                                "79321001",
-                                "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh (Ho Chi Minh Development Bank)",
-                                "Tất cả (All branches)"
-                        );
-                        try {
-                            citadService.insertCitadData(newCitadEntity)
-                                    .doOnSuccess(v -> logger.info("Citad inserted successfully"))
-                                    .doOnError(e -> logger.error("Error inserting Citad", e))
-                                    .subscribe();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        logger.info("Citad not found");
-                    }
-                })
-                .doOnError(e -> logger.error("Error querying Citad", e))
-                .subscribe();
+//        citadService.queryCitad("79321001")
+//                .doOnNext(citadEntity -> {
+//                    if (citadEntity != null) {
+//                        logger.info("Citad already exists");
+//                        clientService.insertClient(citadEntity)
+//                                .doOnSuccess(v -> logger.info("Insert client success"))
+//                                .doOnError(e -> logger.error("Error inserting client", e))
+//                                .subscribe();
+//                    } else {
+//                        CitadEntity newCitadEntity = new CitadEntity(
+//                                "79321001",
+//                                "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh (Ho Chi Minh Development Bank)",
+//                                "Tất cả (All branches)"
+//                        );
+//                        try {
+//                            citadService.insertCitadData(newCitadEntity)
+//                                    .doOnSuccess(v -> logger.info("Citad inserted successfully"))
+//                                    .doOnError(e -> logger.error("Error inserting Citad", e))
+//                                    .subscribe();
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        logger.info("Citad not found");
+//                    }
+//                })
+//                .doOnError(e -> logger.error("Error querying Citad", e))
+//                .subscribe();
     }
 }

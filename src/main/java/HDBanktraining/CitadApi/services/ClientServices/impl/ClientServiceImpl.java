@@ -1,11 +1,13 @@
 package HDBanktraining.CitadApi.services.ClientServices.impl;
 
+import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.ClientResponse;
 import HDBanktraining.CitadApi.entities.CitadEntity;
 import HDBanktraining.CitadApi.entities.ClientEntity;
 import HDBanktraining.CitadApi.mappers.ClientMappers;
 import HDBanktraining.CitadApi.repository.ClientRepo.ClientRepo;
 import HDBanktraining.CitadApi.services.ClientServices.ClientService;
+import HDBanktraining.CitadApi.shared.enums.ResponseEnum;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -61,14 +63,22 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Mono<ClientResponse> getClientByNumber(String number) {
-        try {
-            ClientResponse clientResponse = clientMappers.entityToResponse(clientRepo.findByNumber(number));
-
-            return Mono.just(clientResponse);
-        }catch (Exception e) {
-            return Mono.empty();
+    public Mono<BaseReponse<ClientResponse>> getClientByNumber(String number) {
+        if (number == null || number.isEmpty() || !number.matches("\\d+")) {
+            return Mono.just(new BaseReponse<>(
+                    ResponseEnum.BAD_REQUEST.getResponseCode(),
+                    ResponseEnum.BAD_REQUEST.getMessage(),
+                    null));
         }
+
+        return Mono.justOrEmpty(clientRepo.findByNumber(number))
+                .map(clientMappers::entityToResponse)
+                .map(clientResponse -> new BaseReponse<>(ResponseEnum.SUCCESS.getResponseCode(),
+                        ResponseEnum.SUCCESS.getMessage(),
+                        clientResponse))
+                .switchIfEmpty(Mono.just(new BaseReponse<>(ResponseEnum.DATA_NOT_FOUND.getResponseCode(),
+                        ResponseEnum.DATA_NOT_FOUND.getMessage(),
+                        null)));
     }
 
     @Override

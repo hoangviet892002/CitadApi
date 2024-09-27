@@ -67,14 +67,19 @@ public class CitadServiceImpl implements CitadService {
                                 baseList.setPage(Integer.parseInt(page));
                                 baseList.setSize(Integer.parseInt(size));
                                 Page<CitadEntity> citadReponses = citadRepo.findAll(PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
+
                                 logger.info("Get list citad success");
+
                                 baseList.setTotalRecord((int) citadReponses.getTotalElements());
                                 baseList.setTotalPage(citadReponses.getTotalPages());
                                 baseList.setData(citadMappers.entityToCitadReponse(citadReponses.getContent()));
+
                                 logger.info("Mapping data success");
+
                                 baseReponse.setData(baseList);
                                 baseReponse.setMessage(ResponseEnum.SUCCESS.getMessage());
                                 baseReponse.setResponseCode(ResponseEnum.SUCCESS.getResponseCode());
+
                                 logger.info("Return response");
                                 return Mono.just(baseReponse);
                             } catch (Exception e) {
@@ -143,7 +148,7 @@ public class CitadServiceImpl implements CitadService {
                 .doOnSuccess(unused -> logger.info("Citad data sync completed successfully."));
     }
 
-    private Mono<Void> processCitadEntities(List<CitadReponse> citadDTOs, Set<String> newFileCodes) {
+    public Mono<Void> processCitadEntities(List<CitadReponse> citadDTOs, Set<String> newFileCodes) {
         return Mono.fromRunnable(() -> {
             citadDTOs.forEach(citadDTO -> {
                 CitadEntity existingEntity = citadRepo.findByCode(citadDTO.getCode());
@@ -190,6 +195,7 @@ public class CitadServiceImpl implements CitadService {
     public Mono<CitadEntity> queryCitad(String code) {
         return Mono.justOrEmpty(citadRepo.findByCode(code));
     }
+
     @Override
     public Mono<Void> insertCitadData( CitadEntity citadEntity) throws IOException {
 

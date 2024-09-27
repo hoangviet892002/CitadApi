@@ -28,6 +28,6 @@ public class TranferTransactionImpl  implements TranferTransactionService {
 
     @Override
     public Mono<TransferTransactionEntity> getTransactionById(String id) {
-        return Mono.just(transferTransactionRepo.findByTransactionId(id));
+        return Mono.justOrEmpty(transferTransactionRepo.findByTransactionId(id));
     }
 }

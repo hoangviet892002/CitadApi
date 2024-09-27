@@ -31,7 +31,6 @@ public class OtpServiceImpl implements OtpService {
         this.transactionService = transactionService;
     }
 
-
     @Override
     public Mono<OtpResponse> insertOtp(TransactionEntity transactionEntity) {
         OtpEntity otpEntity = new OtpEntity();
@@ -110,8 +109,6 @@ public class OtpServiceImpl implements OtpService {
         return Mono.just(otpResponse);
     }
 
-
-
     @Override
     public Mono<Boolean> checkOtp(String transactionId, String otp) throws Exception {
         OtpEntity otpEntity = otpRepo.findOtpByTransactionId(transactionId);
@@ -129,6 +126,7 @@ public class OtpServiceImpl implements OtpService {
         otpRepo.save(otpEntity);
         return Mono.just(true);
     }
+
     private void cancleScheduleOTPCleanup(OtpEntity otpEntity) throws Exception {
         logger.info("Cancel schedule OTP cleanup job");
         JobKey jobKey = new JobKey("otpCleanupJob" + otpEntity.getId(), "otpCleanupGroup");

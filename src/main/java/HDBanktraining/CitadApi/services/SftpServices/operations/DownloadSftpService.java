@@ -1,5 +1,7 @@
 package HDBanktraining.CitadApi.services.SftpServices.operations;
 
+import reactor.core.publisher.Mono;
+
 public interface DownloadSftpService {
-    void downloadFile(String remoteFilePath, String localFilePath);
+    Mono<Void> downloadFile(String remoteFilePath, String localFilePath);
 }
