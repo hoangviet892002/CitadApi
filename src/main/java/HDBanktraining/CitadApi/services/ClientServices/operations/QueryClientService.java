@@ -1,5 +1,6 @@
 package HDBanktraining.CitadApi.services.ClientServices.operations;
 
+import HDBanktraining.CitadApi.dtos.response.BaseReponse;
 import HDBanktraining.CitadApi.dtos.response.ClientResponse;
 import HDBanktraining.CitadApi.entities.ClientEntity;
 import reactor.core.publisher.Mono;
@@ -9,5 +10,5 @@ public interface QueryClientService {
 
     Mono<ClientEntity> getClientById(String clientId);
 
-    Mono<ClientResponse> getClientByNumber(String number);
+    Mono<BaseReponse<ClientResponse>> getClientByNumber(String number);
 }

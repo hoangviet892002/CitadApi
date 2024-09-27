@@ -6,38 +6,51 @@ import HDBanktraining.CitadApi.services.ClientServices.ClientService;
 import org.apache.log4j.Logger;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 
 @Component
 public class Runner implements CommandLineRunner {
 
     private static final Logger logger = Logger.getLogger(Runner.class);
 
-
-
-    private  final CitadService citadService;
-
-
-    private  final ClientService clientService;
+    private final CitadService citadService;
+    private final ClientService clientService;
 
     public Runner(CitadService citadService, ClientService clientService) {
         this.citadService = citadService;
         this.clientService = clientService;
     }
 
-
     @Override
-    public void run(String... args) throws Exception {
-        CitadEntity citadEntity = citadService.queryCitad("79321001").block();
-        if (citadEntity != null) {
-            logger.info("Citad already exist");
-            clientService.insertClient(citadEntity).block();
-            logger.info("Insert client success");
-        }
-        else {
-            CitadEntity citadEntity1 = new CitadEntity("79321001", "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh (Ho Chi Minh Development Bank)", "Tất cả (All branches)");
-            citadService.insertCitadData(citadEntity1).block();
-            logger.info("Citad not found");
-        }
+    public void run(String... args) {
+//        citadService.queryCitad("79321001")
+//                .doOnNext(citadEntity -> {
+//                    if (citadEntity != null) {
+//                        logger.info("Citad already exists");
+//                        clientService.insertClient(citadEntity)
+//                                .doOnSuccess(v -> logger.info("Insert client success"))
+//                                .doOnError(e -> logger.error("Error inserting client", e))
+//                                .subscribe();
+//                    } else {
+//                        CitadEntity newCitadEntity = new CitadEntity(
+//                                "79321001",
+//                                "Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh (Ho Chi Minh Development Bank)",
+//                                "Tất cả (All branches)"
+//                        );
+//                        try {
+//                            citadService.insertCitadData(newCitadEntity)
+//                                    .doOnSuccess(v -> logger.info("Citad inserted successfully"))
+//                                    .doOnError(e -> logger.error("Error inserting Citad", e))
+//                                    .subscribe();
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        logger.info("Citad not found");
+//                    }
+//                })
+//                .doOnError(e -> logger.error("Error querying Citad", e))
+//                .subscribe();
     }
 }

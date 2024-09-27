@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientMappers {
     // Converts ClientEntity to ClientResponse
-    public static ClientResponse entityToResponse(ClientEntity clientEntity) {
+    public ClientResponse entityToResponse(ClientEntity clientEntity) {
         if (clientEntity == null) {
             return null;
         }
@@ -21,6 +21,7 @@ public class ClientMappers {
         clientResponse.setAddress(clientEntity.getAddress());
         clientResponse.setDob(clientEntity.getDob());
         clientResponse.setWallet(clientEntity.getWallet());
+        clientResponse.setCitad(clientEntity.getCitad().getId());
 
         return clientResponse;
     }
@@ -31,7 +32,7 @@ public class ClientMappers {
             return null;
         }
         ClientEntity clientEntity = new ClientEntity();
-        clientEntity.setId(clientEntity.getId());
+        clientEntity.setId(clientResponse.getId());
         clientEntity.setName(clientResponse.getName());
         clientEntity.setEmail(clientResponse.getEmail());
         clientEntity.setNumber(clientResponse.getNumber());
@@ -39,7 +40,7 @@ public class ClientMappers {
         clientEntity.setAddress(clientResponse.getAddress());
         clientEntity.setDob(clientResponse.getDob());
         clientEntity.setWallet(clientResponse.getWallet());
-        clientEntity.setCitad(citadEntity); // Set CitadEntity
+        clientEntity.setCitad(citadEntity);
 
         return clientEntity;
     }

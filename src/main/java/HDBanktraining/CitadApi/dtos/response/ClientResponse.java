@@ -36,5 +36,7 @@ public class ClientResponse {
     @JsonProperty("wallet")
     private double wallet;
 
+    @JsonProperty("citad_id")
+    private String citad;
 
 }

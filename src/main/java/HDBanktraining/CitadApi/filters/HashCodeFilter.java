@@ -30,7 +30,14 @@ public class HashCodeFilter extends OncePerRequestFilter {
         final List<Pair<String, String>> bypassToken = Arrays.asList(
                 Pair.of("/swagger-ui/index.html", "GET"),
                 Pair.of("/v3/api-docs", "GET"),
-                Pair.of("/swagger-ui/swagger-initializer.js", "GET")
+                Pair.of("/swagger-ui/swagger-initializer.js", "GET"),
+                Pair.of("/swagger-ui/favicon-16x16.png", "GET"),
+                Pair.of("/swagger-ui/favicon-32x32.png", "GET"),
+                Pair.of("/swagger-ui/swagger-ui.css", "GET"),
+                Pair.of("/swagger-ui/index.css", "GET"),
+                Pair.of("/swagger-ui/swagger-ui-bundle.js", "GET"),
+                Pair.of("/swagger-ui/swagger-ui-standalone-preset.js", "GET")
+
         );
 
         for (Pair<String, String> bypasstoken : bypassToken) {
@@ -41,10 +48,11 @@ public class HashCodeFilter extends OncePerRequestFilter {
         }
 
         try {
-//            String key = request.getHeader("Api-Key");
-            String key = "HashCodeKey";
+            String key = request.getHeader("Api-Key");
+//            String key = "HashCodeKey";
 
             if (key == null) {
+                logger.info("url: " + request.getRequestURI());
                 logger.info("No valid Key provided");
                 throw new ServletException("No valid Key provided");
             }

@@ -31,12 +31,25 @@ public class NapasServiceImpl  implements NapasService {
     }
 
     @Override
-    public Mono<BaseReponse<Client>> getClient(String number) {
-        Client client = restTemplate.getForObject(NAPAS_API + "client?number=" + number, Client.class);
+    public Mono<BaseReponse<Client>> getClient(String number, String bankCode) {
+        if (!number.matches("\\d+") || !bankCode.matches("\\d+")) {
+            return Mono.just(BaseReponse.<Client>builder()
+                    .responseCode(ResponseEnum.BAD_REQUEST.getResponseCode())
+                    .message("Invalid number or bankCode. Both must be numeric.")
+                    .build());
+        }
+
+        Client client = restTemplate.getForObject(NAPAS_API + "client?number=" + number + "&bank=" + bankCode, Client.class);
 
         if (Objects.isNull(client)) {
-            return Mono.just(BaseReponse.<Client>builder().responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode()).message(ResponseEnum.DATA_NOT_FOUND.getMessage()).build());
+            return Mono.just(BaseReponse.<Client>builder()
+                    .responseCode(ResponseEnum.DATA_NOT_FOUND.getResponseCode())
+                    .message(ResponseEnum.DATA_NOT_FOUND.getMessage())
+                    .build());
         }
-        return Mono.just(BaseReponse.<Client>builder().responseCode(ResponseEnum.SUCCESS.getResponseCode()).message(ResponseEnum.SUCCESS.getMessage()).data(client).build());
+        return Mono.just(BaseReponse.<Client>builder()
+                .responseCode(ResponseEnum.SUCCESS.getResponseCode())
+                .message(ResponseEnum.SUCCESS.getMessage()).data(client)
+                .build());
     }
 }
