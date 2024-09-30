@@ -126,12 +126,13 @@ public class CitadServiceImpl implements CitadService {
                     }
 
                     Files.createFile(tempFilePath);
-                    String localFilePath = tempFilePath.toAbsolutePath().toString();
-                    sftpService.downloadFile(REMOTE_FILE_PATH, localFilePath);
-                    logger.info("New file downloaded from the server to local path: " + localFilePath);
-
-                    return localFilePath;
-                }).flatMap(localFilePath -> {
+                    return tempFilePath.toAbsolutePath().toString();
+                })
+                .flatMap(localFilePath -> {
+                    return sftpService.downloadFile(REMOTE_FILE_PATH, localFilePath)
+                            .then(Mono.just(localFilePath));
+                })
+                .flatMap(localFilePath -> {
                     List<CitadReponse> citadDTOs;
                     try {
                         citadDTOs = excelReader.readCitadFromExcel(localFilePath);
@@ -144,7 +145,8 @@ public class CitadServiceImpl implements CitadService {
                             .collect(Collectors.toSet());
 
                     return processCitadEntities(citadDTOs, newFileCodes);
-                }).doOnError(e -> logger.error("Error while processing Citad data", e))
+                })
+                .doOnError(e -> logger.error("Error while processing Citad data", e))
                 .doOnSuccess(unused -> logger.info("Citad data sync completed successfully."));
     }
 
