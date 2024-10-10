@@ -1,0 +1,1 @@
+{"id":"c6961c01-bdf4-4612-965f-b44ca4cacda5","createdAt":[2024,10,4,15,37,31,719106700],"updatedAt":[2024,10,4,15,37,31,719106700],"amount":0.0,"description":"string","status":"PENDING","type":"TRANSFER","active":true}

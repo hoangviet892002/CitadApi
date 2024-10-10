@@ -1,5 +1,6 @@
 package HDBanktraining.CitadApi.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class ClientEntity extends BaseEntity {
     private CitadEntity citad;
 
     @OneToMany(mappedBy = "sender")
+    @JsonBackReference
     private List<TransactionEntity> sentTransfers;
 
     @OneToMany(mappedBy = "receiver")
@@ -52,7 +54,7 @@ public class ClientEntity extends BaseEntity {
         ClientEntity clientEntity = new ClientEntity();
         clientEntity.setCitad(citad);
         clientEntity.setAddress("address");
-        clientEntity.setEmail("email11");
+        clientEntity.setEmail("email");
         clientEntity.setName("viet");
         clientEntity.setPhone("phone");
         clientEntity.setDob("dob");

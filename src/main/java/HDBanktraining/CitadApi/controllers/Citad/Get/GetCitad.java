@@ -26,6 +26,9 @@ public class GetCitad {
 
     private final CitadService citadService;
 
+
+
+
     @Autowired
     public GetCitad(CitadService citadService) {
         this.citadService = citadService;
@@ -34,6 +37,8 @@ public class GetCitad {
     @GetMapping
     @Operation(summary = "Get list citad", description = "Get list citad")
     public Mono<ResponseEntity<BaseReponse<BaseList<CitadReponse>>>>  getListCitad(@RequestParam String page, @RequestParam String size) {
+
+
         return citadService.queryCitads(page, size)
                 .map(response -> {
                     if (response.getResponseCode().equals(ResponseEnum.SUCCESS.getResponseCode())) {

@@ -66,6 +66,7 @@ public class CitadServiceImpl implements CitadService {
                                 BaseList<CitadReponse> baseList = new BaseList<>();
                                 baseList.setPage(Integer.parseInt(page));
                                 baseList.setSize(Integer.parseInt(size));
+                                // Get list citad
                                 Page<CitadEntity> citadReponses = citadRepo.findAll(PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
 
                                 logger.info("Get list citad success");

@@ -1,0 +1,1 @@
+{"id":"553e5a90-745d-4acc-a5ad-072707134bc3","createdAt":[2024,10,6,17,22,29,820784700],"updatedAt":[2024,10,6,17,22,29,820784700],"amount":0.0,"description":"string","status":"PENDING","type":"TRANSFER_TO_OTHER_BANK","active":true}

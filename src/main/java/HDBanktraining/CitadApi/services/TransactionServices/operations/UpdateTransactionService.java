@@ -15,4 +15,6 @@ public interface UpdateTransactionService {
 
     Mono<BaseReponse<AcceptTransferResponse>> acceptTransfer(AcceptTransferRequest acceptTransferRequest);
 
+    Mono<BaseReponse<AcceptTransferResponse>> acceptTransferNapas(AcceptTransferRequest acceptTransferRequest);
+
 }
