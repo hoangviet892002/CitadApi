@@ -60,7 +60,7 @@ public class OtpServiceImpl implements OtpService {
                 .usingJobData("otpId", otpEntity.getId())
                 .build();
         // OTP expired time: 5 minutes
-        long OTP_EXPIRED_TIME = 10 * 1000;
+        final long OTP_EXPIRED_TIME = 5  * 1000;
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
                 .startAt(new java.util.Date(System.currentTimeMillis() + OTP_EXPIRED_TIME))

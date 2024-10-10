@@ -16,7 +16,7 @@ public class QuartzConfig {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean(SpringJobFactory jobFactory) {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
-        factory.setJobFactory(jobFactory); // Set custom job factory
+        factory.setJobFactory(jobFactory);
         return factory;
     }
 

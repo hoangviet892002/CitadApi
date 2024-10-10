@@ -1,7 +1,10 @@
 package HDBanktraining.CitadApi.controllers.testApi.Get;
 
 
+import HDBanktraining.CitadApi.entities.TransactionEntity;
+import HDBanktraining.CitadApi.services.KafkaServices.KafkaProducer;
 import HDBanktraining.CitadApi.utils.EmailUtil;
+import HDBanktraining.CitadApi.utils.converters.TransactionMessageConverter;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.service.Verification;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,17 +26,27 @@ public class GetTestApi {
     @Autowired
     private EmailUtil emailUtil;
 
+    private final KafkaProducer kafkaProducer;
+
     private static final Logger logger = Logger.getLogger(GetTestApi.class);
+
+    public GetTestApi(KafkaProducer kafkaProducer) {
+        this.kafkaProducer = kafkaProducer;
+    }
 
     @GetMapping("/")
     @Operation(summary = "Test API", description = "Test API")
     public Mono<String> test() {
-        logger.info("Infor");
-        try {
-            emailUtil.sendOtpMessage("chotrongnha@gmail.com", "123455");
-        }catch (Exception e){
-            logger.error("Error", e);
-        }
+//        logger.info("Infor");
+//        try {
+//            emailUtil.sendOtpMessage("chotrongnha@gmail.com", "123455");
+//        }catch (Exception e){
+//            logger.error("Error", e);
+//        }
+
+
+        kafkaProducer.sendMessage("transaction", TransactionEntity.builder().amount(1000).type("Chưa đói").build());
+        kafkaProducer.setMessageConverter(new TransactionMessageConverter());
 
         return Mono.just("Hello");
     }
